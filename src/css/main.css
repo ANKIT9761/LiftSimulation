@@ -113,6 +113,7 @@ button:disabled:active {
 .lift{
   display: flex;
   margin: 0 0.5rem;
+  overflow: hidden;
 }
 
 .left-door{
@@ -142,7 +143,7 @@ button:disabled:active {
     transform:translateX(0) ;
   }
   50%{
-    transform: translateX(-4rem);
+    transform: translateX(-100%);
   }
   100%{
     transform: translateX(0);
@@ -154,7 +155,7 @@ button:disabled:active {
     transform:translateX(0) ;
   }
   50%{
-    transform: translateX(4rem);
+    transform: translateX(100%);
   }
   100%{
     transform: translateX(0);
