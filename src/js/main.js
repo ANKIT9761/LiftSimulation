@@ -73,7 +73,7 @@ start_btn.addEventListener('click',()=>{
     // console.log(firstFloor);
     for (let i = 1; i <= lifts; i++) {
       const lift = `
-      <div class="lift lift-${i} not-moving " data-current-floor=0 >
+      <div class="lift lift-${i} not-moving " data-current-floor=1 >
       <div class="left-door " data-left-door=${i}></div>
       <div class="right-door" data-right-door=${i}></div>
       </div> `;
@@ -96,7 +96,7 @@ start_btn.addEventListener('click',()=>{
       
       // disable the button
       if (curFloorButton.disabled==true){
-        console.log(floorNumber);
+        //console.log(floorNumber);
         return ;
       }
       curFloorButton.disabled=true;
@@ -105,13 +105,14 @@ start_btn.addEventListener('click',()=>{
       const getNearestLift=(button)=>{
         const getAllNonMovingLifts=document.querySelectorAll(".not-moving");
         const floorNumber=Number(button.classList[2].split("-")[1])
-      //console.log(getAllNonMovingLifts);
+        //console.log(getAllNonMovingLifts);
         let minDistance=floors;
         let minIndex=-1;
         for(let i=0;i<getAllNonMovingLifts.length;i++){
           let curLift=getAllNonMovingLifts[i];
           let liftFloor=Number(curLift.dataset.currentFloor);
           let distance=Math.abs(floorNumber-liftFloor);
+          //console.log("distance: "+distance+" "+floorNumber+" "+liftFloor);
           if (distance<minDistance){
             minDistance=distance;
             minIndex=i;
@@ -119,6 +120,7 @@ start_btn.addEventListener('click',()=>{
         }
         
         if(minIndex==-1){
+          console.log("no lifts Available",getAllNonMovingLifts)
           return ;
         }
         else{
