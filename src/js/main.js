@@ -13,8 +13,8 @@ function getUserInput(e) {
   let floors=parseInt(floor_input.value)
   let lifts=parseInt(lifts_input.value)
   // console.log(floors,lifts);
-  if (floors<1 || lifts<1 || isNaN(floors) || isNaN(lifts)){
-    alert("Floors and lifts minimum value should be 1");
+  if (floors<2 || lifts<1 || isNaN(floors) || isNaN(lifts)){
+    alert("Floors minimum value should be 2 and lifts minimum value should be 1");
     window.location.reload();
   }
   else{
