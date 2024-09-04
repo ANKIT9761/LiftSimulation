@@ -7,6 +7,8 @@ let input=document.querySelector(".input")
 
 let start_btn=document.getElementById("start-btn");
 
+let buttonQueue=[]
+
 function getUserInput(e) {
   let floors=parseInt(floor_input.value)
   let lifts=parseInt(lifts_input.value)
@@ -64,83 +66,115 @@ start_btn.addEventListener('click',()=>{
 
   // creating lifts
 
-  const liftRow=document.createElement("div");
-  liftRow.setAttribute("class","lift__row");
-  let firstFloor=document.querySelector(".floor-1");
-  // console.log(firstFloor);
-  for (let i = 1; i <= lifts; i++) {
-    const lift = `
-    <div class="lift lift-${i} not-moving " data-current-floor=0 >
-    <div class="left-door " data-left-door=${i}></div>
-    <div class="right-door" data-right-door=${i}></div>
-    </div> `;
+  const createLifts=()=>{
+    const liftRow=document.createElement("div");
+    liftRow.setAttribute("class","lift__row");
+    let firstFloor=document.querySelector(".floor-1");
+    // console.log(firstFloor);
+    for (let i = 1; i <= lifts; i++) {
+      const lift = `
+      <div class="lift lift-${i} not-moving " data-current-floor=0 >
+      <div class="left-door " data-left-door=${i}></div>
+      <div class="right-door" data-right-door=${i}></div>
+      </div> `;
 
-    liftRow.innerHTML += lift;
-    //   Entering Lift in first floor only
-    firstFloor.append(liftRow);
+      liftRow.innerHTML += lift;
+      //   Entering Lift in first floor only
+      firstFloor.append(liftRow);
+    }
   }
 
+  createLifts();
+
   const liftButtons=document.querySelectorAll(".btn");
+
+
   liftButtons.forEach((curFloorButton)=>{
     curFloorButton.addEventListener("click",(e)=>{
-
-      const floorNumber=Number(curFloorButton.classList[2].split("-")[1])
-      const currentLiftButton=e.target;
-      // disable the button
-      curFloorButton.disabled=true;
+      const curLiftButton=e.target;
       
-      const getAllNonMovingLifts=document.querySelectorAll(".not-moving");
-      console.log(getAllNonMovingLifts);
-      let minDistance=floors;
-      let minIndex=-1;
-      for(let i=0;i<getAllNonMovingLifts.length;i++){
-        let curLift=getAllNonMovingLifts[i];
-        let liftFloor=Number(curLift.dataset.currentFloor);
-        let distance=Math.abs(floorNumber-liftFloor);
-        if (distance<minDistance){
-          minDistance=distance;
-          minIndex=i;
+      
+      // disable the button
+      if (curFloorButton.disabled==true){
+        console.log(floorNumber);
+        return ;
+      }
+      curFloorButton.disabled=true;
+      buttonQueue.push(curFloorButton);
+      
+      const getNearestLift=(button)=>{
+        const getAllNonMovingLifts=document.querySelectorAll(".not-moving");
+        const floorNumber=Number(button.classList[2].split("-")[1])
+      //console.log(getAllNonMovingLifts);
+        let minDistance=floors;
+        let minIndex=-1;
+        for(let i=0;i<getAllNonMovingLifts.length;i++){
+          let curLift=getAllNonMovingLifts[i];
+          let liftFloor=Number(curLift.dataset.currentFloor);
+          let distance=Math.abs(floorNumber-liftFloor);
+          if (distance<minDistance){
+            minDistance=distance;
+            minIndex=i;
+          }
+        }
+        
+        if(minIndex==-1){
+          return ;
+        }
+        else{
+          buttonQueue.shift();
+          
+          let curLift=getAllNonMovingLifts[minIndex];
+          // console.log(curLift);
+          curLift.classList.remove("not-moving");
+
+          curLift.style.transform=
+          floorNumber!=1?`translateY(-${15.2*(floorNumber-1)}rem)`
+          :`translateY(0px)`;
+
+          let liftFloor=Number(curLift.dataset.currentFloor);
+          let timeToReachOnFloor=Math.abs(liftFloor-floorNumber)*2;
+
+          curLift.style.transition=`all linear ${timeToReachOnFloor}s`;
+
+          console.log(minIndex,floorNumber,timeToReachOnFloor);
+
+          setTimeout(()=>{
+            button.disabled=false;
+            curLift.classList.add("not-moving");
+            
+            checkQueueIsEmpty(buttonQueue);
+          },(timeToReachOnFloor+5)*1000);
+
+          setTimeout(()=>{
+            console.log("Animation running for lift at floor: "+floorNumber);
+            curLift.children[0].classList.add("left-door--animation");
+            curLift.children[1].classList.add("right-door--animation");
+          },timeToReachOnFloor*1000);
+
+          setTimeout(()=>{
+            console.log("Animation removing for lift at floor: "+floorNumber);
+            curLift.children[0].classList.remove("left-door--animation");
+            curLift.children[1].classList.remove("right-door--animation");
+          },(timeToReachOnFloor+5)*1000);
+          
+          curLift.dataset.currentFloor=floorNumber;
+          
+
+          
+
         }
       }
 
-      if(minIndex==-1){
-        curFloorButton.disabled=false;
-      }
-      else{
-        let curLift=getAllNonMovingLifts[minIndex];
-        console.log(curLift);
-        curLift.classList.remove("not-moving");
-
-        curLift.style.transform=
-        floorNumber!=1?`translateY(-${15.2*(floorNumber-1)}rem)`
-        :`translateY(0px)`;
-
-        let liftFloor=Number(curLift.dataset.currentFloor);
-        let timeToReachOnFloor=Math.abs(liftFloor-floorNumber)*2;
-
-        curLift.style.transition=`all linear ${timeToReachOnFloor}s`;
-
-        setTimeout(()=>{
-          curFloorButton.disabled=false;
-          curLift.classList.add("not-moving");
-        },(timeToReachOnFloor+5)*1000);
-
-        setTimeout(()=>{
-          curLift.children[0].classList.add("left-door--animation");
-          curLift.children[1].classList.add("right-door--animation");
-        },timeToReachOnFloor*1000);
-
-        setTimeout(()=>{
-          curLift.children[0].classList.remove("left-door--animation");
-          curLift.children[1].classList.remove("right-door--animation");
-        },(timeToReachOnFloor+5)*1000);
-        
-        curLift.dataset.currentFloor=floorNumber;
-        
-
-        
+      const checkQueueIsEmpty=(buttonQueue)=>{
+        console.log(buttonQueue);
+        if (buttonQueue.length!=0){
+          getNearestLift(buttonQueue[0]);
+        }
 
       }
+
+      checkQueueIsEmpty(buttonQueue);
 
       
 
