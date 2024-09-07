@@ -15,18 +15,20 @@ function getUserInput(e) {
   // console.log(floors,lifts);
   if (floors<2 || lifts<1 || isNaN(floors) || isNaN(lifts)){
     alert("Floors minimum value should be 2 and lifts minimum value should be 1");
-    window.location.reload();
+    return false;
   }
-  else{
-    sessionStorage.setItem("floors",floors)
-    sessionStorage.setItem("lifts",lifts)
-  }
+
+  sessionStorage.setItem("floors",floors)
+  sessionStorage.setItem("lifts",lifts)
+  return true;
 
 }
 
 
 start_btn.addEventListener('click',()=>{
-  getUserInput();
+  if(!getUserInput()){
+    return;
+  }
   let floors = sessionStorage.getItem("floors");
   let lifts = sessionStorage.getItem("lifts");
   input.classList.add("hidden");
@@ -93,19 +95,14 @@ start_btn.addEventListener('click',()=>{
     curFloorButton.addEventListener("click",(e)=>{
       const curLiftButton=e.target;
       
-      
-      // disable the button
-      if (curFloorButton.disabled==true){
-        //console.log(floorNumber);
-        return ;
-      }
+      // console.log("Button Pressed")
       curFloorButton.disabled=true;
       buttonQueue.push(curFloorButton);
-      
+      // console.log(buttonQueue);
       const getNearestLift=(button)=>{
         const getAllNonMovingLifts=document.querySelectorAll(".not-moving");
         const floorNumber=Number(button.classList[2].split("-")[1])
-        //console.log(getAllNonMovingLifts);
+        //console.log(getAllNonMovingLifts); 1 2 3 4 5
         let minDistance=floors;
         let minIndex=-1;
         for(let i=0;i<getAllNonMovingLifts.length;i++){
@@ -113,6 +110,8 @@ start_btn.addEventListener('click',()=>{
           let liftFloor=Number(curLift.dataset.currentFloor);
           let distance=Math.abs(floorNumber-liftFloor);
           //console.log("distance: "+distance+" "+floorNumber+" "+liftFloor);
+          // 2 2 1
+
           if (distance<minDistance){
             minDistance=distance;
             minIndex=i;
@@ -124,8 +123,9 @@ start_btn.addEventListener('click',()=>{
           return ;
         }
         else{
+          // console.log("Distance lift will be traveling"+minDistance);
           buttonQueue.shift();
-          
+          // console.log(buttonQueue);
           let curLift=getAllNonMovingLifts[minIndex];
           // console.log(curLift);
           curLift.classList.remove("not-moving");
@@ -139,7 +139,28 @@ start_btn.addEventListener('click',()=>{
 
           curLift.style.transition=`all linear ${timeToReachOnFloor}s`;
 
-          console.log(minIndex,floorNumber,timeToReachOnFloor);
+          // console.log(minIndex,floorNumber,timeToReachOnFloor);
+
+          
+          setTimeout(()=>{
+            console.log("Doors Opening")
+            console.log("Left Door ", curLift.children[0])
+            console.log("Right Door ",curLift.children[1])
+            // console.log("Animation running for lift at floor: "+floorNumber);
+            // console.log(curLift.children[0].classList);
+            // console.log(curLift.children[1].classList);
+            curLift.children[0].classList.add("left-door--animation");
+            curLift.children[1].classList.add("right-door--animation");
+          },(timeToReachOnFloor+0.2)*1000);
+
+          setTimeout(()=>{
+            console.log("Doors Closing")
+            // console.log("Animation removing for lift at floor: "+floorNumber);
+            // console.log(curLift.children[0].classList);
+            // console.log(curLift.children[1].classList);
+            curLift.children[0].classList.remove("left-door--animation");
+            curLift.children[1].classList.remove("right-door--animation");
+          },(timeToReachOnFloor+5)*1000);
 
           setTimeout(()=>{
             button.disabled=false;
@@ -148,17 +169,6 @@ start_btn.addEventListener('click',()=>{
             checkQueueIsEmpty(buttonQueue);
           },(timeToReachOnFloor+5)*1000);
 
-          setTimeout(()=>{
-            console.log("Animation running for lift at floor: "+floorNumber);
-            curLift.children[0].classList.add("left-door--animation");
-            curLift.children[1].classList.add("right-door--animation");
-          },timeToReachOnFloor*1000);
-
-          setTimeout(()=>{
-            console.log("Animation removing for lift at floor: "+floorNumber);
-            curLift.children[0].classList.remove("left-door--animation");
-            curLift.children[1].classList.remove("right-door--animation");
-          },(timeToReachOnFloor+5)*1000);
           
           curLift.dataset.currentFloor=floorNumber;
           
@@ -169,7 +179,7 @@ start_btn.addEventListener('click',()=>{
       }
 
       const checkQueueIsEmpty=(buttonQueue)=>{
-        console.log(buttonQueue);
+        
         if (buttonQueue.length!=0){
           getNearestLift(buttonQueue[0]);
         }
