@@ -141,7 +141,7 @@ start_btn.addEventListener('click',()=>{
           let liftFloor=Number(curLift.dataset.currentFloor);
           let timeToReachOnFloor=Math.abs(liftFloor-floorNumber)*2;
 
-          curLift.style.transition=`all linear ${timeToReachOnFloor}s`;
+          curLift.style.transition=`all linear ${timeToReachOnFloor+0.2}s`;
 
           // console.log(minIndex,floorNumber,timeToReachOnFloor);
 
