@@ -13,8 +13,12 @@ function getUserInput(e) {
   let floors=parseInt(floor_input.value)
   let lifts=parseInt(lifts_input.value)
   // console.log(floors,lifts);
-  if (floors<2 || lifts<1 || isNaN(floors) || isNaN(lifts)){
-    alert("Floors minimum value should be 2 and lifts minimum value should be 1");
+  if (floors<1 ||  isNaN(floors)){
+    alert("Floors minimum value should be 1");
+    return false;
+  }
+  if(lifts<1 ||isNaN(lifts)){
+    alert("lifts minimum value should be 1");
     return false;
   }
 
@@ -151,7 +155,7 @@ start_btn.addEventListener('click',()=>{
             // console.log(curLift.children[1].classList);
             curLift.children[0].classList.add("left-door--animation");
             curLift.children[1].classList.add("right-door--animation");
-          },(timeToReachOnFloor+0.2)*1000);
+          },(timeToReachOnFloor)*1000);
 
           setTimeout(()=>{
             console.log("Doors Closing")
