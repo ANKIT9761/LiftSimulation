@@ -106,9 +106,12 @@ start_btn.addEventListener('click',()=>{
       const getNearestLift=(button)=>{
         const getAllNonMovingLifts=document.querySelectorAll(".not-moving");
         const floorNumber=Number(button.classList[2].split("-")[1])
-        //console.log(getAllNonMovingLifts); 1 2 3 4 5
+        let flag=button.classList[1].split("__")[1];
+        console.log(getAllNonMovingLifts);
         let minDistance=floors;
         let minIndex=-1;
+        let minFloor=-1;
+        let maxFloor=-1;
         for(let i=0;i<getAllNonMovingLifts.length;i++){
           let curLift=getAllNonMovingLifts[i];
           let liftFloor=Number(curLift.dataset.currentFloor);
@@ -119,6 +122,22 @@ start_btn.addEventListener('click',()=>{
           if (distance<minDistance){
             minDistance=distance;
             minIndex=i;
+            minFloor=liftFloor;
+            maxFloor=liftFloor;
+          }
+          if (distance==minDistance){
+            if(flag=="up"){
+              if(liftFloor<minFloor){
+                minIndex=i;
+                minFloor=liftFloor;
+              }
+            }
+            else{
+              if(liftFloor>maxFloor){
+                minIndex=i;
+                maxFloor=liftFloor;
+              }
+            }
           }
         }
         
